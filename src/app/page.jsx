@@ -1,5 +1,7 @@
 "use client"
 
+import Footer from '@/components/Footer'
+import ModalForm from '@/components/modal/ModalForm'
 import axios from 'axios'
 import { useState } from 'react'
 
@@ -13,26 +15,29 @@ export default function page() {
     ryb_royal_name: "สมเด็จพระนางเจ้าสุทิดา พัชรสุธาพิมลลักษณ พระบรมราชินี",
   })
 
+  const [openModal, setOpenModal] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     console.log(e)
     const form = e.currentTarget
-    const formData = new FormData(form)
 
     try {
 
       const res = await axios.post('/api/wish', input)
 
       form.reset()
-      alert(res.data.message);
-      console.log(res.data)
+
+      setOpenModal(true)
     } catch (err) {
       console.log(err)
-      alert(err.response.data.message);
+      setOpenModal(true)
+      setErrorMessage(err.response.data.message);
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   const hdlChange = (e) => {
@@ -42,6 +47,10 @@ export default function page() {
   return (
     <div className="bg-[url(/image/bg.webp)] bg-cover bg-center w-dvw h-dvh select-none">
       <div className="w-dvw h-dvh bg-black/20 flex flex-col justify-center items-center px-4">
+
+        {/* แสดงหลังลงนามสำเร็จ */}
+        <ModalForm openModal={openModal} setOpenModal={setOpenModal} errorMessage={errorMessage} />
+
         <div className='bg-gradient-to-b via-[#dea1ee] via-80% from-[#D6A1EE]/0 from-10% to-[#f5e9fb]/0 max-w-[450px] rounded-lg backdrop-blur-xs p-4 relative'> 
           <div className='max-w-[70%] mx-auto pointer-events-none'>
             <img src="https://www.skprivate.go.th/images/events/64-06-03/queen.png" alt="image" />
@@ -60,11 +69,11 @@ export default function page() {
             <div>
               <div className='px-0.5'>
                 <p className='bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent'>ชื่อ <span className='text-red-600'>*</span></p>
-                <input name="ryb_name" onChange={hdlChange} className='w-full border border-[#3F0449] ring-[#3F0449] mt-0 mb-1 rounded-md py-1.5 ' type="text" placeholder='ชื่อ' required />
+                <input name="ryb_name" value={input.ryb_name} autoComplete='given-name' onChange={hdlChange} className='w-full border border-[#3F0449] ring-[#3F0449] mt-0 mb-1 rounded-md py-1.5 ' type="text" placeholder='ชื่อ' required readOnly={loading} />
               </div>
               <div className='px-0.5'>
                 <p className='bg-gradient-to-b from-white to-gray-100 bg-clip-text text-transparent'>นามสกุล <span className='text-red-600'>*</span></p>
-                <input name="ryb_lastname" onChange={hdlChange} className='w-full border border-[#3F0449] ring-[#3F0449] my-0 rounded-md py-1.5 ' type="text" placeholder='นามสกุล' required />
+                <input name="ryb_lastname" autoComplete='family-name' onChange={hdlChange} className='w-full border border-[#3F0449] ring-[#3F0449] my-0 rounded-md py-1.5 ' type="text" placeholder='นามสกุล' required readOnly={loading} />
               </div>
             </div>
 
@@ -73,11 +82,11 @@ export default function page() {
             </div>
 
             <div className='px-1'>
-              <button className='w-full bg-[#3F0449] rounded-md py-2 text-white cursor-pointer hover:bg-[#711282] ease-in-out duration-200 transition-all'>ลงนามถวายพระพร</button>
+              <button className='w-full bg-[#3F0449] rounded-md py-2 text-white cursor-pointer hover:bg-[#711282] ease-in-out duration-200 transition-all disabled:opacity-25 disabled:hover:cursor-not-allowed disabled:hover:bg-[#3F0449]' disabled={loading} >{loading ? "กำลังลงนาม..." : "ลงนามถวายพระพร"}</button>
             </div>
           </form>
         </div>
-        <p className='text-white/50 text-xs my-2'>&copy; 2568 กลุ่มงานสุขภาพดิจิทัล โรงพยาบาลอากาศอำนวย</p>
+        <Footer textStyle={"text-white"} />
       </div>
     </div>
   )
