@@ -21,7 +21,8 @@ export default function page() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-    console.log(e)
+    setErrorMessage("")
+
     const form = e.currentTarget
 
     try {
