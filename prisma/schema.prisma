@@ -1,0 +1,1178 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model accessibilities {
+  accessibility_id     Int          @id @default(autoincrement())
+  route_front_id       Int
+  department_id        Int?
+  user_id              Int?
+  accessibility_status Boolean?
+  created_at           DateTime     @default(now()) @db.Timestamp(0)
+  created_by           String?      @default("admin") @db.VarChar(100)
+  updated_at           DateTime     @default(now()) @db.Timestamp(0)
+  updated_by           String?      @default("admin") @db.VarChar(100)
+  departments          departments? @relation(fields: [department_id], references: [department_id], onDelete: Restrict, onUpdate: Restrict, map: "accessibilities_departments_lbfk_1")
+  route_fronts         route_fronts @relation(fields: [route_front_id], references: [route_front_id], onUpdate: Restrict, map: "accessibilities_route_fronts_lbfk_1")
+  users                users?       @relation(fields: [user_id], references: [user_id], onDelete: Restrict, onUpdate: Restrict, map: "accessibilities_users_lbfk_1")
+
+  @@index([department_id], map: "accessibilities_departments_lbfk_1")
+  @@index([route_front_id], map: "accessibilities_route_fronts_lbfk_1")
+  @@index([user_id], map: "accessibilities_users_lbfk_1")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model accessibilities_log {
+  accessibility_log_id Int      @id @default(autoincrement())
+  ip_address           String   @db.VarChar(100)
+  name                 String   @db.VarChar(100)
+  request_method       String   @db.VarChar(100)
+  endpoint             String   @db.VarChar(100)
+  execution_time       Float    @db.Float
+  row_count            Float    @db.Float
+  status               String   @db.VarChar(100)
+  created_at           DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model activity_rooms {
+  activity_room_id    Int             @id @default(autoincrement())
+  activity_topic_id   Int
+  user_id             Int
+  check_in_signature  Bytes           @db.Blob
+  check_in_status_id  Int
+  check_out_signature Bytes?          @db.Blob
+  check_out_status_id Int?
+  created_at          DateTime        @default(now()) @db.Timestamp(0)
+  created_by          String?         @db.VarChar(50)
+  updated_at          DateTime        @default(dbgenerated("('0000-00-00 00:00:00')")) @db.Timestamp(0)
+  updated_by          String?         @db.VarChar(50)
+  activity_topics     activity_topics @relation(fields: [activity_topic_id], references: [activity_topic_id], onUpdate: Restrict, map: "activity_rooms_on_activity_topics")
+  users               users           @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "activity_rooms_on_users")
+
+  @@index([activity_topic_id], map: "activity_rooms_on_activity_topics")
+  @@index([user_id], map: "activity_rooms_on_users")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model activity_topic_files {
+  activity_topic_file_id     Int             @id @default(autoincrement())
+  activity_topic_id          Int
+  activity_topic_file_name   String          @db.VarChar(50)
+  activity_topic_file        Bytes           @db.Blob
+  activity_topic_file_detail String?         @db.LongText
+  created_at                 DateTime        @default(now()) @db.Timestamp(0)
+  created_by                 String?         @default("admin") @db.VarChar(50)
+  updated_at                 DateTime        @default(now()) @db.Timestamp(0)
+  updated_by                 String?         @default("admin") @db.VarChar(50)
+  activity_topics            activity_topics @relation(fields: [activity_topic_id], references: [activity_topic_id], onUpdate: Restrict, map: "activity_topic_files_on_activity_topics")
+
+  @@index([activity_topic_id], map: "activity_topic_files_on_activity_topics")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model activity_topics {
+  activity_topic_id              Int                    @id @default(autoincrement())
+  activity_topic_name            String                 @db.VarChar(255)
+  activity_topic_date_time_start DateTime               @db.DateTime(0)
+  activity_topic_date_time_end   DateTime               @db.DateTime(0)
+  activity_topic_detail          String?                @db.LongText
+  activity_is_active             Boolean?               @default(true)
+  created_at                     DateTime               @default(now()) @db.Timestamp(0)
+  created_by                     String?                @default("admin") @db.VarChar(50)
+  updated_at                     DateTime               @default(now()) @db.Timestamp(0)
+  updated_by                     String?                @default("admin") @db.VarChar(50)
+  activity_rooms                 activity_rooms[]
+  activity_topic_files           activity_topic_files[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model akathospital_version_details {
+  akathospital_version_detail_id      Int                   @id @default(autoincrement())
+  akathospital_version_detail_comment String                @db.LongText
+  akathospital_version_id             Int
+  created_at                          DateTime              @default(now()) @db.Timestamp(0)
+  created_by                          String?               @default("admin") @db.VarChar(100)
+  updated_at                          DateTime              @default(now()) @db.Timestamp(0)
+  updated_by                          String?               @default("admin") @db.VarChar(100)
+  akathospital_versions               akathospital_versions @relation(fields: [akathospital_version_id], references: [akathospital_version_id], onUpdate: Restrict, map: "akathospital_version_details_fblk")
+
+  @@index([akathospital_version_id], map: "api_version_details_fblk")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model akathospital_version_details_log {
+  akathospital_version_detail_log_id Int      @id @default(autoincrement())
+  ip_address                         String   @db.VarChar(100)
+  name                               String   @db.VarChar(100)
+  request_method                     String   @db.VarChar(100)
+  endpoint                           String   @db.VarChar(100)
+  execution_time                     Float    @db.Float
+  row_count                          Float    @db.Float
+  status                             String   @db.VarChar(100)
+  created_at                         DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model akathospital_versions {
+  akathospital_version_id      Int                            @id @default(autoincrement())
+  akathospital_version_name    String                         @db.VarChar(50)
+  created_at                   DateTime                       @default(now()) @db.Timestamp(0)
+  created_by                   String?                        @default("admin") @db.VarChar(100)
+  updated_at                   DateTime                       @default(now()) @db.Timestamp(0)
+  updated_by                   String?                        @default("admin") @db.VarChar(100)
+  akathospital_version_details akathospital_version_details[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model akathospital_versions_log {
+  akathospital_version_log_id Int      @id @default(autoincrement())
+  ip_address                  String   @db.VarChar(100)
+  name                        String   @db.VarChar(100)
+  request_method              String   @db.VarChar(100)
+  endpoint                    String   @db.VarChar(100)
+  execution_time              Float    @db.Float
+  row_count                   Float    @db.Float
+  status                      String   @db.VarChar(100)
+  created_at                  DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model api_version_details {
+  api_version_detail_id      Int          @id @default(autoincrement())
+  api_version_detail_comment String       @db.LongText
+  api_version_id             Int
+  created_at                 DateTime     @default(now()) @db.Timestamp(0)
+  created_by                 String?      @default("admin") @db.VarChar(100)
+  updated_at                 DateTime     @default(now()) @db.Timestamp(0)
+  updated_by                 String?      @default("admin") @db.VarChar(100)
+  api_versions               api_versions @relation(fields: [api_version_id], references: [api_version_id], onUpdate: Restrict, map: "api_version_details_fblk")
+
+  @@index([api_version_id], map: "api_version_details_fblk")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model api_version_details_log {
+  api_version_detail_log_id Int      @id @default(autoincrement())
+  ip_address                String   @db.VarChar(100)
+  name                      String   @db.VarChar(100)
+  request_method            String   @db.VarChar(100)
+  endpoint                  String   @db.VarChar(100)
+  execution_time            Float    @db.Float
+  row_count                 Float    @db.Float
+  status                    String   @db.VarChar(100)
+  created_at                DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model api_versions {
+  api_version_id      Int                   @id @default(autoincrement())
+  api_version_name    String                @db.VarChar(50)
+  created_at          DateTime              @default(now()) @db.Timestamp(0)
+  created_by          String?               @default("admin") @db.VarChar(100)
+  updated_at          DateTime              @default(now()) @db.Timestamp(0)
+  updated_by          String?               @default("admin") @db.VarChar(100)
+  api_version_details api_version_details[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model api_versions_log {
+  api_version_log_id Int      @id @default(autoincrement())
+  ip_address         String   @db.VarChar(100)
+  name               String   @db.VarChar(100)
+  request_method     String   @db.VarChar(100)
+  endpoint           String   @db.VarChar(100)
+  execution_time     Float    @db.Float
+  row_count          Float    @db.Float
+  status             String   @db.VarChar(100)
+  created_at         DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model attendance_records {
+  attendance_record_id                                                      Int               @id @default(autoincrement())
+  user_id                                                                   Int
+  shift_type_id                                                             Int?
+  shift_id                                                                  Int?
+  starting                                                                  String?           @db.VarChar(50)
+  starting_signature_id                                                     Int?
+  check_in_status_id                                                        Int?
+  ending                                                                    String?           @db.VarChar(50)
+  ending_signature_id                                                       Int?
+  check_out_status_id                                                       Int?
+  otp_verified                                                              Boolean?          @default(false)
+  created_at                                                                DateTime          @default(now()) @db.Timestamp(0)
+  created_by                                                                String            @default("admin") @db.VarChar(50)
+  updated_at                                                                DateTime          @default(now()) @db.Timestamp(0)
+  updated_by                                                                String            @default("admin") @db.VarChar(50)
+  check_in_status                                                           check_in_status?  @relation(fields: [check_in_status_id], references: [check_in_status_id], onDelete: Restrict, onUpdate: Restrict, map: "attendance_records_on_check_in_status")
+  check_out_status                                                          check_out_status? @relation(fields: [check_out_status_id], references: [check_out_status_id], onDelete: Restrict, onUpdate: Restrict, map: "attendance_records_on_check_out_status")
+  shift_types                                                               shift_types?      @relation(fields: [shift_type_id], references: [shift_type_id], onDelete: Restrict, onUpdate: Restrict, map: "attendance_records_on_shift_types")
+  shifts                                                                    shifts?           @relation(fields: [shift_id], references: [shift_id], onDelete: Restrict, onUpdate: Restrict, map: "attendance_records_on_shifts")
+  signature_users_attendance_records_starting_signature_idTosignature_users signature_users?  @relation("attendance_records_starting_signature_idTosignature_users", fields: [starting_signature_id], references: [signature_user_id], onDelete: Restrict, onUpdate: Restrict, map: "attendance_records_on_signature_users_lbfk_1")
+  signature_users_attendance_records_ending_signature_idTosignature_users   signature_users?  @relation("attendance_records_ending_signature_idTosignature_users", fields: [ending_signature_id], references: [signature_user_id], onDelete: Restrict, onUpdate: Restrict, map: "attendance_records_on_signature_users_lbfk_2")
+  users                                                                     users             @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "attendance_records_on_users")
+
+  @@index([check_in_status_id], map: "attendance_records_on_check_in_status")
+  @@index([check_out_status_id], map: "attendance_records_on_check_out_status")
+  @@index([shift_type_id], map: "attendance_records_on_shift_types")
+  @@index([shift_id], map: "attendance_records_on_shifts")
+  @@index([starting_signature_id], map: "attendance_records_on_signature_users_lbfk_1")
+  @@index([ending_signature_id], map: "attendance_records_on_signature_users_lbfk_2")
+  @@index([user_id], map: "attendance_records_on_users")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model attendance_records_log {
+  complaint_log_id Int      @id @default(autoincrement())
+  ip_address       String   @db.VarChar(100)
+  name             String   @db.VarChar(100)
+  request_method   String   @db.VarChar(100)
+  endpoint         String   @db.LongText
+  execution_time   Float    @db.Float
+  row_count        Float    @db.Float
+  status           String   @db.VarChar(100)
+  created_at       DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model auth_log {
+  complaint_log_id Int      @id @default(autoincrement())
+  ip_address       String   @db.VarChar(100)
+  name             String   @db.VarChar(100)
+  request_method   String   @db.VarChar(100)
+  endpoint         String   @db.VarChar(100)
+  execution_time   Float    @db.Float
+  row_count        Float    @db.Float
+  status           String   @db.VarChar(100)
+  created_at       DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model auth_tokens {
+  auth_token_id Int      @id @default(autoincrement())
+  token         String   @unique(map: "token") @db.VarChar(255)
+  user_id       Int
+  otp_verified  Boolean? @default(false)
+  created_at    DateTime @default(now()) @db.Timestamp(0)
+  expires_at    DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.Timestamp(0)
+  is_active     Boolean? @default(true)
+  users         users    @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "user_id")
+
+  @@index([user_id], map: "user_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model carousels {
+  carousel_id    Int      @id @default(autoincrement())
+  carousel_name  String   @unique(map: "carousel_setting_name") @db.VarChar(100)
+  carousel_image Bytes    @db.MediumBlob
+  created_at     DateTime @default(now()) @db.Timestamp(0)
+  created_by     String?  @default("admin") @db.VarChar(100)
+  updated_at     DateTime @default(now()) @db.Timestamp(0)
+  updated_by     String?  @default("admin") @db.VarChar(100)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model carousels_log {
+  carousels_log_id Int      @id @default(autoincrement())
+  ip_address       String   @db.VarChar(100)
+  name             String   @db.VarChar(100)
+  request_method   String   @db.VarChar(100)
+  endpoint         String   @db.VarChar(100)
+  execution_time   Float    @db.Float
+  row_count        Float    @db.Float
+  status           String   @db.VarChar(100)
+  created_at       DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model check_in_status {
+  check_in_status_id   Int                  @id @default(autoincrement())
+  check_in_status_name String               @unique(map: "check_in_status_name") @db.VarChar(100)
+  created_at           DateTime             @default(now()) @db.Timestamp(0)
+  created_by           String               @db.VarChar(100)
+  updated_at           DateTime             @default(now()) @db.Timestamp(0)
+  updated_by           String               @db.VarChar(100)
+  attendance_records   attendance_records[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model check_in_status_log {
+  complaint_log_id Int      @id @default(autoincrement())
+  ip_address       String   @db.VarChar(100)
+  name             String   @db.VarChar(100)
+  request_method   String   @db.VarChar(100)
+  endpoint         String   @db.VarChar(100)
+  execution_time   Float    @db.Float
+  row_count        Float    @db.Float
+  status           String   @db.VarChar(100)
+  created_at       DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model check_out_status {
+  check_out_status_id   Int                  @id @default(autoincrement())
+  check_out_status_name String               @unique(map: "check_out_status_name") @db.VarChar(100)
+  created_at            DateTime             @default(now()) @db.Timestamp(0)
+  created_by            String               @db.VarChar(100)
+  updated_at            DateTime             @default(now()) @db.Timestamp(0)
+  updated_by            String               @db.VarChar(100)
+  attendance_records    attendance_records[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model check_out_status_log {
+  check_out_status_id Int      @id @default(autoincrement())
+  ip_address          String   @db.VarChar(100)
+  name                String   @db.VarChar(100)
+  request_method      String   @db.VarChar(100)
+  endpoint            String   @db.VarChar(100)
+  execution_time      Float    @db.Float
+  row_count           Float    @db.Float
+  status              String   @db.VarChar(100)
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model complaint_topics {
+  complaint_topic_id   Int          @id @default(autoincrement())
+  complaint_topic_name String       @db.VarChar(100)
+  created_at           DateTime     @default(now()) @db.Timestamp(0)
+  created_by           String       @db.VarChar(100)
+  updated_at           DateTime     @default(now()) @db.Timestamp(0)
+  updated_by           String       @db.VarChar(100)
+  complaints           complaints[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model complaint_topics_log {
+  complaint_topic_log_id Int      @id @default(autoincrement())
+  ip_address             String   @db.VarChar(100)
+  name                   String   @db.VarChar(100)
+  request_method         String   @db.VarChar(100)
+  endpoint               String   @db.VarChar(100)
+  execution_time         Float    @db.Float
+  row_count              Float    @db.Float
+  status                 String   @db.VarChar(100)
+  created_at             DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model complaints {
+  complaint_id       Int              @id @default(autoincrement())
+  fullname           String           @db.VarChar(100)
+  email              String           @db.VarChar(100)
+  telephone_number   String           @db.VarChar(50)
+  complaint_topic_id Int
+  detail             String           @db.LongText
+  created_at         DateTime         @default(now()) @db.Timestamp(0)
+  created_by         String           @db.VarChar(100)
+  updated_at         DateTime         @default(now()) @db.Timestamp(0)
+  updated_by         String           @db.VarChar(100)
+  complaint_topics   complaint_topics @relation(fields: [complaint_topic_id], references: [complaint_topic_id], onUpdate: Restrict, map: "complaints_ibfk_1")
+
+  @@index([complaint_topic_id], map: "complaints_ibfk_1")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model complaints_log {
+  complaint_log_id Int      @id @default(autoincrement())
+  ip_address       String   @db.VarChar(100)
+  name             String   @db.VarChar(100)
+  request_method   String   @db.VarChar(100)
+  endpoint         String   @db.VarChar(100)
+  execution_time   Float    @db.Float
+  row_count        Float    @db.Float
+  status           String   @db.VarChar(100)
+  created_at       DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model content_of_medical_records {
+  content_of_medical_record_id               Int                                          @id @default(autoincrement())
+  content_of_medical_record_name             String                                       @unique(map: "content_of_medical_record_name") @db.VarChar(255)
+  na_type                                    Boolean?                                     @default(false)
+  missing_type                               Boolean?
+  no_type                                    Boolean?
+  criterion_number_1_type                    Boolean?
+  criterion_number_2_type                    Boolean?
+  criterion_number_3_type                    Boolean?
+  criterion_number_4_type                    Boolean?
+  criterion_number_5_type                    Boolean?
+  criterion_number_6_type                    Boolean?
+  criterion_number_7_type                    Boolean?
+  criterion_number_8_type                    Boolean?
+  criterion_number_9_type                    Boolean?
+  points_deducted_type                       Boolean?                                     @default(false)
+  patient_service_id                         Int?
+  created_at                                 DateTime                                     @default(now()) @db.Timestamp(0)
+  created_by                                 String?                                      @default("admin") @db.VarChar(255)
+  updated_at                                 DateTime                                     @default(now()) @db.Timestamp(0)
+  updated_by                                 String?                                      @default("admin") @db.VarChar(255)
+  patient_services                           patient_services?                            @relation(fields: [patient_service_id], references: [patient_service_id], onDelete: Restrict, onUpdate: Restrict, map: "content_of_medical_records_ibfk_1")
+  form_ipd_content_of_medical_record_results form_ipd_content_of_medical_record_results[]
+
+  @@index([patient_service_id], map: "patient_services_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model content_of_medical_records_log {
+  content_of_medical_record_log_id Int      @id @default(autoincrement())
+  ip_address                       String   @db.VarChar(100)
+  name                             String   @db.VarChar(100)
+  request_method                   String   @db.VarChar(100)
+  endpoint                         String   @db.VarChar(100)
+  execution_time                   Float    @db.Float
+  row_count                        Float    @db.Float
+  status                           String   @db.VarChar(100)
+  created_at                       DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model departments {
+  department_id            Int                        @id @default(autoincrement())
+  department_name          String                     @unique(map: "department_name") @db.VarChar(100)
+  created_at               DateTime                   @default(now()) @db.Timestamp(0)
+  created_by               String?                    @default("admin") @db.VarChar(100)
+  updated_at               DateTime                   @default(now()) @db.Timestamp(0)
+  updated_by               String?                    @default("admin") @db.VarChar(100)
+  accessibilities          accessibilities[]
+  employee_system_requests employee_system_requests[]
+  users                    users[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model departments_log {
+  department_log_id Int      @id @default(autoincrement())
+  ip_address        String   @db.VarChar(100)
+  name              String   @db.VarChar(100)
+  request_method    String   @db.VarChar(100)
+  endpoint          String   @db.VarChar(100)
+  execution_time    Float    @db.Float
+  row_count         Float    @db.Float
+  status            String   @db.VarChar(100)
+  created_at        DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model director_biographies {
+  director_biographie_id          Int      @id @default(autoincrement())
+  user_id                         Int
+  director_biographie_description String   @db.LongText
+  created_at                      DateTime @default(now()) @db.Timestamp(0)
+  created_by                      String?  @default("admin") @db.VarChar(100)
+  updated_at                      DateTime @default(now()) @db.Timestamp(0)
+  updated_by                      String?  @default("admin") @db.VarChar(100)
+  users                           users    @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "director_biographies_users_lbfk_1")
+
+  @@index([user_id], map: "director_biographies_users_lbfk_1")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model director_biographies_log {
+  director_biographie_log_id Int      @id @default(autoincrement())
+  ip_address                 String   @db.VarChar(100)
+  name                       String   @db.VarChar(100)
+  request_method             String   @db.VarChar(100)
+  endpoint                   String   @db.VarChar(100)
+  execution_time             Float    @db.Float
+  row_count                  Float    @db.Float
+  status                     String   @db.VarChar(100)
+  created_at                 DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model employee_system_requests {
+  employee_system_request_id Int         @id @default(autoincrement())
+  birth_date                 DateTime    @db.Date
+  join_date                  DateTime    @db.Date
+  prefix_id                  Int
+  thai_first_name            String      @db.VarChar(100)
+  thai_last_name             String      @db.VarChar(100)
+  eng_first_name             String      @db.VarChar(100)
+  eng_last_name              String      @db.VarChar(100)
+  national_id                String      @db.VarChar(100)
+  department_id              Int
+  position_id                Int
+  medical_license_no         String      @db.VarChar(100)
+  medical_license_start      DateTime?   @db.Date
+  medical_license_expire     DateTime?   @db.Date
+  username                   String      @db.VarChar(100)
+  password                   String      @db.VarChar(100)
+  created_at                 DateTime    @default(now()) @db.Timestamp(0)
+  created_by                 String      @db.VarChar(100)
+  departments                departments @relation(fields: [department_id], references: [department_id], onUpdate: Restrict, map: "employee_system_requests_on_departments")
+  positions                  positions   @relation(fields: [position_id], references: [position_id], onUpdate: Restrict, map: "employee_system_requests_on_positions")
+  prefixes                   prefixes    @relation(fields: [prefix_id], references: [prefix_id], onUpdate: Restrict, map: "employee_system_requests_on_prefixes")
+
+  @@index([department_id], map: "employee_system_requests_on_departments")
+  @@index([position_id], map: "employee_system_requests_on_positions")
+  @@index([prefix_id], map: "employee_system_requests_on_prefixes")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model employee_system_requests_log {
+  employee_system_request_log_id Int      @id @default(autoincrement())
+  ip_address                     String   @db.VarChar(100)
+  name                           String   @db.VarChar(100)
+  request_method                 String   @db.VarChar(100)
+  endpoint                       String   @db.VarChar(100)
+  execution_time                 Float    @db.Float
+  row_count                      Float    @db.Float
+  status                         String   @db.VarChar(100)
+  created_at                     DateTime @default(now()) @db.Timestamp(0)
+}
+
+model enrollee {
+  id         Int    @id @default(autoincrement())
+  fullname   String @db.VarChar(255)
+  position   String @db.VarChar(255)
+  department String @db.VarChar(255)
+  created_at String @default(dbgenerated("(current_timestamp())")) @db.LongText
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model executive_committees {
+  executive_committee_id Int          @id @default(autoincrement())
+  fiscal_year_id         Int
+  user_id                Int
+  created_at             DateTime     @default(now()) @db.Timestamp(0)
+  created_by             String?      @default("admin") @db.VarChar(100)
+  updated_at             DateTime     @default(now()) @db.Timestamp(0)
+  updated_by             String?      @default("admin") @db.VarChar(100)
+  fiscal_years           fiscal_years @relation(fields: [fiscal_year_id], references: [fiscal_year_id], onUpdate: Restrict, map: "executive_committees_fiscal_years_lbfk_1")
+  users                  users        @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "executive_committees_users_lbfk_1")
+
+  @@index([fiscal_year_id], map: "executive_committees_fiscal_years_lbfk_1")
+  @@index([user_id], map: "executive_committees_users_lbfk_1")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model fiscal_years {
+  fiscal_year_id       Int                    @id @default(autoincrement())
+  fiscal_year_name     String                 @unique(map: "fiscal_year_name") @db.VarChar(100)
+  created_at           DateTime               @default(now()) @db.Timestamp(0)
+  created_by           String?                @default("admin") @db.VarChar(100)
+  updated_at           DateTime               @default(now()) @db.Timestamp(0)
+  updated_by           String?                @default("admin") @db.VarChar(100)
+  executive_committees executive_committees[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model fiscal_years_log {
+  fiscal_year_log_id Int      @id @default(autoincrement())
+  ip_address         String   @db.VarChar(100)
+  name               String   @db.VarChar(100)
+  request_method     String   @db.VarChar(100)
+  endpoint           String   @db.VarChar(100)
+  execution_time     Float    @db.Float
+  row_count          Float    @db.Float
+  status             String   @db.VarChar(100)
+  created_at         DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model form_ipd_content_of_medical_record_results {
+  form_ipd_content_of_medical_record_result_id Int                        @id @default(autoincrement())
+  form_ipd_id                                  Int
+  content_of_medical_record_id                 Int
+  na                                           Boolean?                   @default(false)
+  missing                                      Boolean?                   @default(false)
+  no                                           Boolean?                   @default(false)
+  criterion_number_1                           Int?
+  criterion_number_2                           Int?
+  criterion_number_3                           Int?
+  criterion_number_4                           Int?
+  criterion_number_5                           Int?
+  criterion_number_6                           Int?
+  criterion_number_7                           Int?
+  criterion_number_8                           Int?
+  criterion_number_9                           Int?
+  point_deducted                               Int?
+  total_score                                  Int?
+  comment                                      String?                    @db.LongText
+  created_at                                   DateTime                   @default(now()) @db.Timestamp(0)
+  created_by                                   String                     @db.VarChar(100)
+  updated_at                                   DateTime                   @default(now()) @db.Timestamp(0)
+  updated_by                                   String                     @db.VarChar(100)
+  form_ipds                                    form_ipds                  @relation(fields: [form_ipd_id], references: [form_ipd_id], onUpdate: Restrict, map: "form_ipd_content_of_medical_record_results_ibfk_1")
+  content_of_medical_records                   content_of_medical_records @relation(fields: [content_of_medical_record_id], references: [content_of_medical_record_id], onUpdate: Restrict, map: "form_ipd_content_of_medical_record_results_ibfk_2")
+
+  @@index([form_ipd_id], map: "form_ipd_content_of_medical_record_results_ibfk_1")
+  @@index([content_of_medical_record_id], map: "form_ipd_content_of_medical_record_results_ibfk_2")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model form_ipd_overall_finding_results {
+  form_ipd_overall_finding_result_id Int             @id @default(autoincrement())
+  form_ipd_id                        Int
+  overall_finding_id                 Int
+  overall_finding_result             Boolean?
+  created_at                         DateTime        @default(now()) @db.Timestamp(0)
+  created_by                         String          @db.VarChar(100)
+  updated_at                         DateTime        @default(now()) @db.Timestamp(0)
+  updated_by                         String          @db.VarChar(100)
+  form_ipds                          form_ipds       @relation(fields: [form_ipd_id], references: [form_ipd_id], onUpdate: Restrict, map: "form_ipd_overall_finding_results_ibfk_1")
+  overall_finding                    overall_finding @relation(fields: [overall_finding_id], references: [overall_finding_id], onUpdate: Restrict, map: "form_ipd_overall_finding_results_ibfk_2")
+
+  @@index([form_ipd_id], map: "form_ipd_overall_finding_results_ibfk_1")
+  @@index([overall_finding_id], map: "form_ipd_overall_finding_results_ibfk_2")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model form_ipd_review_status_results {
+  form_ipd_review_status_result_id Int           @id @default(autoincrement())
+  form_ipd_id                      Int
+  review_status_id                 Int
+  review_status_result             Boolean?
+  review_status_comment            String?       @db.LongText
+  created_at                       DateTime      @default(now()) @db.Timestamp(0)
+  created_by                       String        @db.VarChar(100)
+  updated_at                       DateTime      @default(now()) @db.Timestamp(0)
+  updated_by                       String        @db.VarChar(100)
+  form_ipds                        form_ipds     @relation(fields: [form_ipd_id], references: [form_ipd_id], onUpdate: Restrict, map: "form_ipd_review_status_results_ibfk_1")
+  review_status                    review_status @relation(fields: [review_status_id], references: [review_status_id], onUpdate: Restrict, map: "form_ipd_review_status_results_ibfk_2")
+
+  @@index([form_ipd_id], map: "form_ipd_review_status_results_ibfk_1")
+  @@index([review_status_id], map: "form_ipd_review_status_results_ibfk_2")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model form_ipds {
+  form_ipd_id                                Int                                          @id @default(autoincrement())
+  patient_id                                 Int
+  created_at                                 DateTime                                     @default(now()) @db.Timestamp(0)
+  created_by                                 String                                       @db.VarChar(100)
+  updated_at                                 DateTime                                     @default(now()) @db.Timestamp(0)
+  updated_by                                 String                                       @db.VarChar(100)
+  form_ipd_content_of_medical_record_results form_ipd_content_of_medical_record_results[]
+  form_ipd_overall_finding_results           form_ipd_overall_finding_results[]
+  form_ipd_review_status_results             form_ipd_review_status_results[]
+  patients                                   patients                                     @relation(fields: [patient_id], references: [patient_id], onUpdate: Restrict, map: "form_ipd_ibfk_1")
+
+  @@index([patient_id], map: "form_ipd_ibfk_1")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model forms_log {
+  form_log_id    Int      @id @default(autoincrement())
+  ip_address     String   @db.VarChar(100)
+  name           String   @db.VarChar(100)
+  request_method String   @db.VarChar(100)
+  endpoint       String   @db.VarChar(100)
+  execution_time Float    @db.Float
+  row_count      Float    @db.Float
+  status         String   @db.VarChar(100)
+  created_at     DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model hcodes {
+  hcode_id   Int        @id @default(autoincrement())
+  hcode      String     @unique(map: "hcode") @db.VarChar(100)
+  hcode_name String     @unique(map: "hcode_name") @db.VarChar(100)
+  created_at DateTime   @default(now()) @db.Timestamp(0)
+  created_by String?    @default("admin") @db.VarChar(100)
+  updated_at DateTime   @default(now()) @db.Timestamp(0)
+  updated_by String?    @default("admin") @db.VarChar(100)
+  patients   patients[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model hcodes_log {
+  holiday_log_id Int      @id @default(autoincrement())
+  ip_address     String   @db.VarChar(100)
+  name           String   @db.VarChar(100)
+  request_method String   @db.VarChar(100)
+  endpoint       String   @db.VarChar(100)
+  execution_time Float    @db.Float
+  row_count      Float    @db.Float
+  status         String   @db.VarChar(100)
+  created_at     DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model holidays {
+  holiday_id   Int      @id @default(autoincrement())
+  holiday_name String   @db.LongText
+  holiday_date String   @unique(map: "holiday_date") @default("0000-00-00") @db.VarChar(50)
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  created_by   String   @db.VarChar(100)
+  updated_at   DateTime @default(now()) @db.Timestamp(0)
+  updated_by   String   @db.VarChar(100)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model holidays_log {
+  holiday_log_id Int      @id @default(autoincrement())
+  ip_address     String   @db.VarChar(100)
+  name           String   @db.VarChar(100)
+  request_method String   @db.VarChar(100)
+  endpoint       String   @db.VarChar(100)
+  execution_time Float    @db.Float
+  row_count      Float    @db.Float
+  status         String   @db.VarChar(100)
+  created_at     DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model hospital_profiles {
+  hospital_profile_id          Int      @id @default(autoincrement())
+  hospital_profile_description String   @db.LongText
+  created_at                   DateTime @default(now()) @db.Timestamp(0)
+  created_by                   String?  @default("admin") @db.VarChar(100)
+  updated_at                   DateTime @default(now()) @db.Timestamp(0)
+  updated_by                   String?  @default("admin") @db.VarChar(100)
+  hospital_profile_years       String   @db.VarChar(50)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model hospital_profiles_log {
+  hospital_profile_log_id Int      @id @default(autoincrement())
+  ip_address              String   @db.VarChar(100)
+  name                    String   @db.VarChar(100)
+  request_method          String   @db.VarChar(100)
+  endpoint                String   @db.VarChar(100)
+  execution_time          Float    @db.Float
+  row_count               Float?   @db.Float
+  status                  String   @db.VarChar(100)
+  created_at              DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model main_navbars {
+  main_navbar_id   Int           @id @default(autoincrement())
+  main_navbar_name String        @db.VarChar(100)
+  main_navbar_link String?       @db.VarChar(100)
+  created_at       DateTime      @default(now()) @db.Timestamp(0)
+  created_by       String?       @default("admin") @db.VarChar(100)
+  updated_at       DateTime      @default(now()) @db.Timestamp(0)
+  updated_by       String?       @default("admin") @db.VarChar(100)
+  sub_navbars      sub_navbars[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model main_sidebars {
+  main_sidebar_id   Int            @id @default(autoincrement())
+  main_sidebar_name String         @db.VarChar(100)
+  main_sidebar_link String?        @db.VarChar(100)
+  created_at        DateTime       @default(now()) @db.Timestamp(0)
+  created_by        String?        @default("admin") @db.VarChar(100)
+  updated_at        DateTime       @default(now()) @db.Timestamp(0)
+  updated_by        String?        @default("admin") @db.VarChar(100)
+  sub_sidebars      sub_sidebars[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model main_vision_mission_statements {
+  main_vision_mission_statement_id   Int                             @id @default(autoincrement())
+  main_vision_mission_statement_name String                          @db.VarChar(100)
+  created_at                         DateTime                        @default(now()) @db.Timestamp(0)
+  created_by                         String?                         @default("admin") @db.VarChar(100)
+  updated_at                         DateTime                        @default(now()) @db.Timestamp(0)
+  updated_by                         String?                         @default("admin") @db.VarChar(100)
+  sub_vision_mission_statements      sub_vision_mission_statements[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model notify_users {
+  notify_user_id      Int      @id @default(autoincrement())
+  notify_user_service String   @db.VarChar(100)
+  notify_user_token   String   @db.VarChar(255)
+  user_id             Int      @unique(map: "user_id")
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+  created_by          String?  @default("admin") @db.VarChar(100)
+  updated_at          DateTime @default(now()) @db.Timestamp(0)
+  updated_by          String?  @default("admin") @db.VarChar(100)
+  users               users    @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "notify_users_on_users")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model notify_users_log {
+  notify_user_log_id Int      @id @default(autoincrement())
+  ip_address         String   @db.VarChar(100)
+  name               String   @db.VarChar(100)
+  request_method     String   @db.VarChar(100)
+  endpoint           String   @db.VarChar(100)
+  execution_time     Float    @db.Float
+  row_count          Float    @db.Float
+  status             String   @db.VarChar(100)
+  created_at         DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model overall_finding {
+  overall_finding_id               Int                                @id @default(autoincrement())
+  overall_finding_name             String?                            @db.LongText
+  patient_service_id               Int?
+  created_at                       DateTime                           @default(now()) @db.Timestamp(0)
+  created_by                       String?                            @db.VarChar(255)
+  updated_at                       DateTime                           @default(now()) @db.Timestamp(0)
+  updated_by                       String?                            @db.VarChar(255)
+  form_ipd_overall_finding_results form_ipd_overall_finding_results[]
+  patient_services                 patient_services?                  @relation(fields: [patient_service_id], references: [patient_service_id], onDelete: Restrict, onUpdate: Restrict, map: "overall_finding_ibfk_1")
+
+  @@index([patient_service_id], map: "patient_services_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model overall_finding_log {
+  overall_finding_log_id Int      @id @default(autoincrement())
+  ip_address             String   @db.VarChar(100)
+  name                   String   @db.VarChar(100)
+  request_method         String   @db.VarChar(100)
+  endpoint               String   @db.VarChar(100)
+  execution_time         Float    @db.Float
+  row_count              Float    @db.Float
+  status                 String   @db.VarChar(100)
+  created_at             DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model patient_services {
+  patient_service_id           Int                          @id @default(autoincrement())
+  patient_service_name_english String                       @unique(map: "patient_service_name_english") @db.VarChar(100)
+  patient_service_name_thai    String                       @unique(map: "patient_service_name_thai") @db.VarChar(100)
+  created_at                   DateTime                     @default(now()) @db.Timestamp(0)
+  created_by                   String?                      @default("admin") @db.VarChar(255)
+  updated_at                   DateTime                     @default(now()) @db.Timestamp(0)
+  updated_by                   String?                      @default("admin") @db.VarChar(255)
+  content_of_medical_records   content_of_medical_records[]
+  overall_finding              overall_finding[]
+  review_status                review_status[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model patient_services_log {
+  patient_service_log_id Int      @id @default(autoincrement())
+  ip_address             String   @db.VarChar(100)
+  name                   String   @db.VarChar(100)
+  request_method         String   @db.VarChar(100)
+  endpoint               String   @db.VarChar(100)
+  execution_time         Float    @db.Float
+  row_count              Float    @db.Float
+  status                 String   @db.VarChar(100)
+  created_at             DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model patients {
+  patient_id              Int         @id @default(autoincrement())
+  hcode_id                Int
+  patient_fullname        String      @db.VarChar(255)
+  patient_hn              String      @db.VarChar(255)
+  patient_vn              String?     @unique(map: "vn") @db.VarChar(255)
+  patient_an              String?     @unique(map: "an") @db.VarChar(255)
+  patient_ward            String?     @db.VarChar(100)
+  patient_date_service    DateTime?   @db.Date
+  patient_date_admitted   DateTime?   @db.Date
+  patient_date_discharged DateTime?   @db.Date
+  created_at              DateTime    @default(now()) @db.Timestamp(0)
+  created_by              String?     @default("admin") @db.VarChar(255)
+  updated_at              DateTime    @default(now()) @db.Timestamp(0)
+  updated_by              String?     @default("admin") @db.VarChar(255)
+  form_ipds               form_ipds[]
+  hcodes                  hcodes      @relation(fields: [hcode_id], references: [hcode_id], onUpdate: Restrict, map: "patients_on_hcodes_lbfk_1")
+
+  @@index([hcode_id], map: "patients_on_hcodes_lbfk_1")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model positions {
+  position_id              Int                        @id @default(autoincrement())
+  position_name            String                     @db.VarChar(100)
+  created_at               DateTime                   @default(now()) @db.Timestamp(0)
+  created_by               String?                    @default("admin") @db.VarChar(100)
+  updated_at               DateTime                   @default(now()) @db.Timestamp(0)
+  updated_by               String?                    @default("admin") @db.VarChar(100)
+  employee_system_requests employee_system_requests[]
+  users                    users[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model positions_log {
+  position_log_id Int      @id @default(autoincrement())
+  ip_address      String   @db.VarChar(100)
+  name            String   @db.VarChar(100)
+  request_method  String   @db.VarChar(100)
+  endpoint        String   @db.VarChar(100)
+  execution_time  Float    @db.Float
+  row_count       Float    @db.Float
+  status          String   @db.VarChar(100)
+  created_at      DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model prefixes {
+  prefix_id                Int                        @id @default(autoincrement())
+  prefix_name              String                     @unique(map: "prefix_name") @db.VarChar(100)
+  created_at               DateTime                   @default(now()) @db.Timestamp(0)
+  created_by               String?                    @default("admin") @db.VarChar(100)
+  updated_at               DateTime                   @default(now()) @db.Timestamp(0)
+  updated_by               String?                    @default("admin") @db.VarChar(100)
+  employee_system_requests employee_system_requests[]
+  users                    users[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model prefixes_log {
+  prefix_log_id  Int      @id @default(autoincrement())
+  ip_address     String   @db.VarChar(100)
+  name           String   @db.VarChar(100)
+  request_method String   @db.VarChar(100)
+  endpoint       String   @db.VarChar(100)
+  execution_time Float    @db.Float
+  row_count      Float    @db.Float
+  status         String   @db.VarChar(100)
+  created_at     DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model review_status {
+  review_status_id               Int                              @id @default(autoincrement())
+  review_status_name             String                           @unique(map: "review_status_name") @db.VarChar(100)
+  review_status_description      String                           @db.VarChar(100)
+  review_status_type             Boolean?                         @default(false)
+  patient_service_id             Int?
+  created_at                     DateTime                         @default(now()) @db.Timestamp(0)
+  created_by                     String?                          @db.VarChar(255)
+  updated_at                     DateTime                         @default(now()) @db.Timestamp(0)
+  updated_by                     String?                          @db.VarChar(255)
+  form_ipd_review_status_results form_ipd_review_status_results[]
+  patient_services               patient_services?                @relation(fields: [patient_service_id], references: [patient_service_id], onDelete: Restrict, onUpdate: Restrict, map: "review_status_ibfk_1")
+
+  @@index([patient_service_id], map: "patient_services_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model review_status_log {
+  review_status_log_id Int      @id @default(autoincrement())
+  ip_address           String   @db.VarChar(100)
+  name                 String   @db.VarChar(100)
+  request_method       String   @db.VarChar(100)
+  endpoint             String   @db.VarChar(100)
+  execution_time       Float    @db.Float
+  row_count            Float    @db.Float
+  status               String   @db.VarChar(100)
+  created_at           DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model route_fronts {
+  route_front_id   Int               @id @default(autoincrement())
+  route_front_name String            @db.VarChar(100)
+  route_front_path String            @db.LongText
+  created_at       DateTime          @default(now()) @db.Timestamp(0)
+  created_by       String?           @default("admin") @db.VarChar(100)
+  updated_at       DateTime          @default(now()) @db.Timestamp(0)
+  updated_by       String?           @default("admin") @db.VarChar(100)
+  accessibilities  accessibilities[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model route_fronts_log {
+  route_front_log_id Int      @id @default(autoincrement())
+  ip_address         String   @db.VarChar(100)
+  name               String   @db.VarChar(100)
+  request_method     String   @db.VarChar(100)
+  endpoint           String   @db.VarChar(100)
+  execution_time     Float    @db.Float
+  row_count          Float    @db.Float
+  status             String   @db.VarChar(100)
+  created_at         DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model royal_blessings {
+  ryb_id          Int      @id @default(autoincrement())
+  ryb_name        String   @db.Char(100)
+  ryb_lastname    String   @db.Char(100)
+  ryb_event_title String   @db.VarChar(255)
+  ryb_royal_name  String   @db.VarChar(255)
+  created_at      DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model shift_types {
+  shift_type_id      Int                  @id @default(autoincrement())
+  shift_type_name    String               @unique(map: "shift_type_name") @db.VarChar(100)
+  created_at         DateTime             @default(now()) @db.Timestamp(0)
+  created_by         String               @db.VarChar(100)
+  updated_at         DateTime             @default(now()) @db.Timestamp(0)
+  updated_by         String               @db.VarChar(100)
+  attendance_records attendance_records[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model shift_types_log {
+  shift_type_log_id Int      @id @default(autoincrement())
+  ip_address        String   @db.VarChar(100)
+  name              String   @db.VarChar(100)
+  request_method    String   @db.VarChar(100)
+  endpoint          String   @db.VarChar(100)
+  execution_time    Float    @db.Float
+  row_count         Float    @db.Float
+  status            String   @db.VarChar(100)
+  created_at        DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model shifts {
+  shift_id           Int                  @id @default(autoincrement())
+  shift_name         String               @unique(map: "shift_name") @db.VarChar(100)
+  shift_starting     String               @default("00:00:00") @db.VarChar(50)
+  shift_late         String?              @db.VarChar(50)
+  shift_ending       String               @default("00:00:00") @db.VarChar(50)
+  shift_early        String?              @db.VarChar(255)
+  created_at         DateTime             @default(now()) @db.Timestamp(0)
+  created_by         String               @db.VarChar(100)
+  updated_at         DateTime             @default(now()) @db.Timestamp(0)
+  updated_by         String               @db.VarChar(100)
+  attendance_records attendance_records[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model shifts_log {
+  shift_log_id   Int      @id @default(autoincrement())
+  ip_address     String   @db.VarChar(100)
+  name           String   @db.VarChar(100)
+  request_method String   @db.VarChar(100)
+  endpoint       String   @db.VarChar(100)
+  execution_time Float    @db.Float
+  row_count      Float    @db.Float
+  status         String   @db.VarChar(100)
+  created_at     DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model signature_users {
+  signature_user_id                                                            Int                  @id @default(autoincrement())
+  signature_user_token                                                         Bytes
+  user_id                                                                      Int                  @unique(map: "user_id")
+  expired                                                                      DateTime             @default(now()) @db.Timestamp(0)
+  created_at                                                                   DateTime             @default(now()) @db.Timestamp(0)
+  created_by                                                                   String?              @default("admin") @db.VarChar(100)
+  updated_at                                                                   DateTime             @default(now()) @db.Timestamp(0)
+  updated_by                                                                   String?              @default("admin") @db.VarChar(100)
+  attendance_records_attendance_records_starting_signature_idTosignature_users attendance_records[] @relation("attendance_records_starting_signature_idTosignature_users")
+  attendance_records_attendance_records_ending_signature_idTosignature_users   attendance_records[] @relation("attendance_records_ending_signature_idTosignature_users")
+  users                                                                        users                @relation(fields: [user_id], references: [user_id], onUpdate: Restrict, map: "signature_users_on_users_lbfk_1")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model signature_users_log {
+  signature_user_log_id Int      @id @default(autoincrement())
+  ip_address            String   @db.VarChar(100)
+  name                  String   @db.VarChar(100)
+  request_method        String   @db.VarChar(100)
+  endpoint              String   @db.VarChar(100)
+  execution_time        Float    @db.Float
+  row_count             Float    @db.Float
+  status                String   @db.VarChar(100)
+  created_at            DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model sub_navbars {
+  sub_navbar_id   Int          @id @default(autoincrement())
+  main_navbar_id  Int
+  sub_navbar_name String       @db.VarChar(100)
+  sub_navbar_link String?      @db.VarChar(100)
+  created_at      DateTime     @default(now()) @db.Timestamp(0)
+  created_by      String?      @default("admin") @db.VarChar(100)
+  updated_at      DateTime     @default(now()) @db.Timestamp(0)
+  updated_by      String?      @default("admin") @db.VarChar(100)
+  main_navbars    main_navbars @relation(fields: [main_navbar_id], references: [main_navbar_id], onUpdate: Restrict, map: "sub_main_navbars_lbfk_1")
+
+  @@index([main_navbar_id], map: "sub_main_navbars_lbfk_1")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model sub_sidebars {
+  sub_sidebar_id   Int           @id @default(autoincrement())
+  main_sidebar_id  Int
+  sub_sidebar_name String        @db.VarChar(100)
+  sub_sidebar_link String?       @db.VarChar(100)
+  created_at       DateTime      @default(now()) @db.Timestamp(0)
+  created_by       String?       @default("admin") @db.VarChar(100)
+  updated_at       DateTime      @default(now()) @db.Timestamp(0)
+  updated_by       String?       @default("admin") @db.VarChar(100)
+  main_sidebars    main_sidebars @relation(fields: [main_sidebar_id], references: [main_sidebar_id], onUpdate: Restrict, map: "sub_main_sidebars_lbfk_1")
+
+  @@index([main_sidebar_id], map: "sub_main_sidebars_lbfk_1")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model sub_vision_mission_statements {
+  sub_vision_mission_statement_id   Int                            @id @default(autoincrement())
+  main_vision_mission_statement_id  Int
+  sub_vision_mission_statement_name String                         @db.VarChar(100)
+  created_at                        DateTime                       @default(now()) @db.Timestamp(0)
+  created_by                        String?                        @default("admin") @db.VarChar(100)
+  updated_at                        DateTime                       @default(now()) @db.Timestamp(0)
+  updated_by                        String?                        @default("admin") @db.VarChar(100)
+  main_vision_mission_statements    main_vision_mission_statements @relation(fields: [main_vision_mission_statement_id], references: [main_vision_mission_statement_id], onUpdate: Restrict, map: "sub_main_vision_mission_statement_lbfk_1")
+
+  @@index([main_vision_mission_statement_id], map: "sub_main_vision_mission_statement_lbfk_1")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model token_blacklist {
+  token_blacklist_id Int      @id @default(autoincrement())
+  token              String   @unique(map: "token") @db.VarChar(255)
+  blacklisted_at     DateTime @default(now()) @db.Timestamp(0)
+  expires_at         DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.Timestamp(0)
+}
+
+model training {
+  training_id        Int      @id @default(autoincrement())
+  training_name      String   @unique(map: "training_name") @db.VarChar(100)
+  training_break     Boolean?
+  training_morning   Boolean? @default(false)
+  training_noon      Boolean? @default(false)
+  training_afternoon Boolean? @default(false)
+  training_number    Int
+  created_at         DateTime @default(now()) @db.Timestamp(0)
+  updated_at         DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model users {
+  user_id              Int                    @id @default(autoincrement())
+  username             String                 @unique(map: "username") @db.VarChar(100)
+  email                String                 @unique(map: "email") @db.VarChar(100)
+  password             String                 @db.VarChar(100)
+  prefix_id            Int
+  fullname_thai        String                 @db.VarChar(100)
+  fullname_english     String?                @db.VarChar(100)
+  national_id          BigInt                 @unique(map: "national_id")
+  position_id          Int?
+  department_id        Int?
+  status               String?                @db.VarChar(50)
+  image                Bytes?
+  created_at           DateTime               @default(now()) @db.Timestamp(0)
+  updated_at           DateTime               @default(now()) @db.Timestamp(0)
+  accessibilities      accessibilities[]
+  activity_rooms       activity_rooms[]
+  attendance_records   attendance_records[]
+  auth_tokens          auth_tokens[]
+  director_biographies director_biographies[]
+  executive_committees executive_committees[]
+  notify_users         notify_users?
+  signature_users      signature_users?
+  departments          departments?           @relation(fields: [department_id], references: [department_id], onDelete: Restrict, onUpdate: Restrict, map: "users_on_departments")
+  positions            positions?             @relation(fields: [position_id], references: [position_id], onDelete: Restrict, onUpdate: Restrict, map: "users_on_positions")
+  prefixes             prefixes               @relation(fields: [prefix_id], references: [prefix_id], onUpdate: Restrict, map: "users_on_prefixes")
+
+  @@index([department_id], map: "users_on_departments")
+  @@index([position_id], map: "users_on_positions")
+  @@index([prefix_id], map: "users_on_prefixes")
+}
