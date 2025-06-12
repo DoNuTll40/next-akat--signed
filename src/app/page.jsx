@@ -70,7 +70,7 @@ export default function page() {
             <div>
               <div className='px-0.5'>
                 <p className='bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent'>ชื่อ <span className='text-red-600'>*</span></p>
-                <input name="ryb_name" value={input.ryb_name} autoComplete='given-name' onChange={hdlChange} className='w-full border border-[#3F0449] ring-[#3F0449] mt-0 mb-1 rounded-md py-1.5 ' type="text" placeholder='ชื่อ' required readOnly={loading} />
+                <input name="ryb_name" autoComplete='given-name' onChange={hdlChange} className='w-full border border-[#3F0449] ring-[#3F0449] mt-0 mb-1 rounded-md py-1.5 ' type="text" placeholder='ชื่อ' required readOnly={loading} />
               </div>
               <div className='px-0.5'>
                 <p className='bg-gradient-to-b from-white to-gray-100 bg-clip-text text-transparent'>นามสกุล <span className='text-red-600'>*</span></p>
