@@ -4,7 +4,7 @@ export const metadata = {
   title: "ลงนามถวายพระพรชัยมงคล",
   description: "ลงนามถวายพระพรชัยมงคล",
   icons: {
-    icon: '/image/moph-logo.png',
+    icon: '/wellwishes/image/moph-logo.png',
   },
 };
 

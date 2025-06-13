@@ -46,7 +46,7 @@ export default function page() {
   }
 
   return (
-    <div className="bg-[url(/image/bg.webp)] bg-cover bg-center w-dvw h-dvh select-none">
+    <div className="bg-[url(/wellwishes/image/bg.webp)] bg-cover bg-center w-dvw h-dvh select-none">
       <div className="w-dvw h-dvh bg-black/20 flex flex-col justify-center items-center px-4">
 
         {/* แสดงหลังลงนามสำเร็จ */}

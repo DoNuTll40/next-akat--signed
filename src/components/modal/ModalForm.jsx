@@ -19,7 +19,7 @@ export default function ModalForm({ openModal, setOpenModal, errorMessage }) {
             className='w-full max-w-[320px] bg-white p-2 rounded-2xl shadow-lg relative'>
 
             <div className='absolute -top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[80px] rounded-full overflow-hidden shadow-lg border-6 border-white/20'>
-              <img src="/image/bw.jpg" alt="logo" />
+              <img src="/wellwishes/image/bw.jpg" alt="logo" />
             </div>
 
             <div className='w-full text-center flex flex-col gap-2 mt-11'>
