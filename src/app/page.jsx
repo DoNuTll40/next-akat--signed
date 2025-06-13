@@ -27,15 +27,14 @@ export default function page() {
 
     try {
 
-      const res = await axios.post('/api/wish', input)
+      const res = await axios.post('/wellwishes/api/wish', input)
 
       form.reset()
-
       setOpenModal(true)
     } catch (err) {
       console.log(err)
-      setOpenModal(true)
       setErrorMessage(err.response.data.message);
+      setOpenModal(true)
     } finally {
       setLoading(false)
     }
